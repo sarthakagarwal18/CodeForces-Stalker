@@ -52,8 +52,7 @@ def populate():
 
     i = 0
 
-    # while i < len(handles):
-    while i < 4:
+    while i < len(handles):
 
         url = "http://codeforces.com/profile/" + handles[i]
         soup = get_response(url)
