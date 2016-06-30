@@ -2,6 +2,8 @@ from bs4 import BeautifulSoup
 import requests
 from tabulate import tabulate
 import time
+import sys
+import webbrowser
 
 
 def tabulate_results(user_handle, user_title, user_rating, max_rating):
@@ -19,6 +21,17 @@ def tabulate_results(user_handle, user_title, user_rating, max_rating):
         table.append(entry)
 
     print(tabulate(table, headers=["Index", "Handle", "Title", "Rating", "Max Rating"]))
+
+
+def get_response(url):
+    try:
+        source_code = requests.get(url, verify=False, timeout=240)
+    except:
+        time.sleep(5)
+        source_code = requests.get(url, verify=False, timeout=240)
+    plain_text = source_code.text
+    soup = BeautifulSoup(plain_text, "html.parser")
+    return soup
 
 
 def read_file():
@@ -39,16 +52,11 @@ def populate():
 
     i = 0
 
-    while i < len(handles):
+    # while i < len(handles):
+    while i < 4:
 
         url = "http://codeforces.com/profile/" + handles[i]
-        try:
-            source_code = requests.get(url, verify=False, timeout=240)
-        except:
-            time.sleep(5)
-            source_code = requests.get(url, verify=False, timeout=240)
-        plain_text = source_code.text
-        soup = BeautifulSoup(plain_text, "html.parser")
+        soup = get_response(url)
 
         link = soup.findAll('div', {'class': 'info'})
         for div in link:
@@ -69,6 +77,13 @@ def main():
     user_handle, user_title, user_rating, max_rating = populate()
 
     tabulate_results(user_handle, user_title, user_rating, max_rating)
+
+    index = int(input("Choose option: 1-"+str(len(user_handle)) + " to view profile OR press "+str(len(user_handle)+1)+" to exit : "))
+
+    if index >= 1 and index <= len(user_handle):
+        webbrowser.open("http://codeforces.com/profile/" + user_handle[index-1])
+    else:
+        sys.exit(1)
 
 
 if __name__ == "__main__":
