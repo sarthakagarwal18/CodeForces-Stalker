@@ -13,8 +13,8 @@ def tabulate_results(user_handle, user_title, user_rating, max_rating):
         entry = []
         entry.append(i+1)
         entry.append(user_handle[i])
-        entry.append(user_rating[i])
         entry.append(user_title[i])
+        entry.append(user_rating[i])
         entry.append(max_rating[i])
         table.append(entry)
 
@@ -39,10 +39,14 @@ def populate():
 
     i = 0
 
-    while i < 6:
+    while i < len(handles):
 
         url = "http://codeforces.com/profile/" + handles[i]
-        source_code = requests.get(url)
+        try:
+            source_code = requests.get(url, verify=False, timeout=240)
+        except:
+            time.sleep(5)
+            source_code = requests.get(url, verify=False, timeout=240)
         plain_text = source_code.text
         soup = BeautifulSoup(plain_text, "html.parser")
 
@@ -56,8 +60,6 @@ def populate():
         max_rating.append(span[4].string)
 
         i += 1
-        # if i%4==0:
-        #     time.sleep(2)
 
     return user_handle, user_title, user_rating, max_rating
 
